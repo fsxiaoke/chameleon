@@ -1,6 +1,6 @@
 {
   "name": "chameleon-tool",
-  "version": "0.1.1",
+  "version": "0.1.2-fs",
   "description": "chameleon 脚手架工具",
   "main": "chameleon.js",
   "scripts": {
