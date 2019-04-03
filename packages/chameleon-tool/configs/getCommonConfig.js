@@ -18,6 +18,8 @@ module.exports = function (options) {
   } = options;
 
   function getstaticPath(filetype) {
+    const staticPath = cml.config.get().staticPath;
+    if(typeof staticPath === 'string') return `${staticPath}/[name]_[hash:7].[ext]`;
     return `static/${filetype}/[name]_[hash:7].[ext]`
   }
 
