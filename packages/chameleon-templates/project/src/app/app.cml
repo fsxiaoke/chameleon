@@ -5,6 +5,7 @@
 <script>
 import store from '../store/index.js'
 import routerConfig from '../router.config.json';
+import api from 'fs-base-chameleon';
 
 class App {
   data = {
@@ -12,6 +13,17 @@ class App {
     routerConfig
   }
   created(res) {
+      api.config.init({
+          appId: 'FSAID_5f5e533',
+          jsApiList: ['selectEnterpriseContact'],
+          beta: true,
+          debug: true,
+          timestamp: new Date().getTime(),
+          nonceStr: '1111',
+          signature: 'String',
+          onSuccess: ()=>{},
+          onFail:  ()=>{}
+      })
   }
 }
 
