@@ -46,7 +46,7 @@
     "chameleon-miniapp-target": "^0.1.1",
     "chameleon-mixins": "^0.1.1",
     "chameleon-template-parse": "^0.1.1",
-    "chameleon-templates": "^0.1.1",
+    "chameleon-templates": "0.1.1-fs",
     "chameleon-tool-utils": "^0.1.1",
     "chameleon-url-loader": "^0.1.1",
     "chameleon-vue-precompiler": "^0.1.1",
