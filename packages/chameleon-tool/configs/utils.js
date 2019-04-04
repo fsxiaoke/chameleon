@@ -449,6 +449,7 @@ exports.getDevServerPath = function () {
 }
 
 let babelNpm = [
+  'fs-base-chameleon',
   "chameleon-ui-builtin",
   'cml-ui',
   'chameleon-runtime',
