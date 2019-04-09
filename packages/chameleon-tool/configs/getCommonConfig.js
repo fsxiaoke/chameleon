@@ -18,8 +18,6 @@ module.exports = function (options) {
   } = options;
 
   function getstaticPath(filetype) {
-    const staticPath = cml.config.get().staticPath;
-    if(typeof staticPath === 'string') return `${staticPath}/[name]_[hash:7].[ext]`;
     return `static/${filetype}/[name]_[hash:7].[ext]`
   }
 
@@ -87,9 +85,7 @@ module.exports = function (options) {
         loader: 'chameleon-url-loader',
         options: {
           limit: false, // 不做limit的base64转换，需要添加?inline参数
-            publicPath:cml.config.get().weex.publicPath,
-            outputPath:getstaticPath('img'),
-            name: '[name]_[hash:7].[ext]'
+          name: getstaticPath('img')
         }
       }, {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,

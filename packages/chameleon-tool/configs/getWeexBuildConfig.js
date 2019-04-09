@@ -20,6 +20,20 @@ module.exports = function (options) {
     output: {
       path: outputPath
     },
+    // module:{
+    //   rules:[
+    //       {
+    //           test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+    //           loader: 'chameleon-url-loader',
+    //           options: {
+    //               limit: false, // 不做limit的base64转换，需要添加?inline参数
+    //               publicPath: cml.config.get().weex.publicPath,
+    //               outputPath:`${cml.config.get().staticPath}`,
+    //               name: '[name]_[hash:7].[ext]'
+    //           }
+    //       }
+    //   ]
+    // },
     plugins: [
       new CleanWebpackPlugin(['./*'], {root: outputPath, verbose: false}),
       new AssetsPlugin({
@@ -72,14 +86,24 @@ module.exports = function (options) {
           }
 
         }
-      })
+      }),
       new ZipPlugin({
           filename: 'bundle.zip',
-          path:outputPath,
       })
     ]
   }
+    const weexCommonConfig = getWeexCommonConfig(options);
 
+    weexCommonConfig.module.rules.forEach((e,index) => {
+        if(index === 2){
+            e.options = {
+                limit: false, // 不做limit的base64转换，需要添加?inline参数
+                publicPath: cml.config.get().weex.publicPath,
+                outputPath:`${cml.config.get().staticPath}`,
+                name: '[name]_[hash:7].[ext]'
+            }
+        }
+    })
 
-  return merge(getWeexCommonConfig(options), buildConfig)
+  return merge(weexCommonConfig, buildConfig)
 }
