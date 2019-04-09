@@ -40,7 +40,8 @@ module.exports = function (options) {
   let commonConfig = {
     stats: cml.logLevel === 'debug' ? 'verbose' : 'none',
     output: {
-      publicPath: publicPath
+      publicPath: publicPath,
+      filename:'[name]_[hash:7].[ext]'
     },
     resolve: {
       symlinks: false,
@@ -86,7 +87,9 @@ module.exports = function (options) {
         loader: 'chameleon-url-loader',
         options: {
           limit: false, // 不做limit的base64转换，需要添加?inline参数
-          name: getstaticPath('img')
+            publicPath:cml.config.get().weex.publicPath,
+            outputPath:getstaticPath('img'),
+            name: '[name]_[hash:7].[ext]'
         }
       }, {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,

@@ -1,6 +1,7 @@
 var path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
-const AssetsPlugin = require('assets-webpack-plugin')
+const AssetsPlugin = require('assets-webpack-plugin');
+const ZipPlugin = require('zip-webpack-plugin');
 
 
 var getWeexCommonConfig = require('./getWeexCommonConfig.js');
@@ -71,6 +72,10 @@ module.exports = function (options) {
           }
 
         }
+      })
+      new ZipPlugin({
+          filename: 'bundle.zip',
+          path:outputPath,
       })
     ]
   }
