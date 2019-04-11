@@ -29,7 +29,7 @@ module.exports = function(content) {
             {
               path: "${item.url}",
               name: "${item.name}",
-              component: require("$PROJECT/src${item.path}.cml")
+              component: require("$PROJECT/src${item.path}.cml").default
             },
             `
         })
