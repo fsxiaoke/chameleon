@@ -64,7 +64,10 @@ module.exports = function (options) {
     module: {
       rules: [{
         test: path.resolve(root, 'node_modules/chameleon-runtime/.temp/router.js'),
-        loader: path.join(__dirname, 'routerLoader.js')
+        loader: path.join(__dirname, 'routerLoader.js'),
+        options: {
+          cmlType: type,
+        }
       },
       {
         test: /\.js$/,

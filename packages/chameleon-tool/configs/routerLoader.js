@@ -13,15 +13,28 @@ module.exports = function(content) {
   } else {
     let mode = routerConfig.mode;
     let routerList = '';
-    routerConfig.routes.forEach(item => {
-      routerList += `
-      {
-        path: "${item.url}",
-        name: "${item.name}",
-        component: require("$PROJECT/src${item.path}.cml").default
-      },
-      `
-    })
+    if(this.query.cmlType && this.query.cmlType === 'web'){
+        routerConfig.routes.forEach(item => {
+            routerList += `
+            {
+              path: "${item.url}",
+              name: "${item.name}",
+              component: resolve => require(["$PROJECT/src${item.path}.cml"], resolve)
+            },
+            `
+        })
+    } else {
+        routerConfig.routes.forEach(item => {
+            routerList += `
+            {
+              path: "${item.url}",
+              name: "${item.name}",
+              component: require("$PROJECT/src${item.path}.cml")
+            },
+            `
+        })
+    }
+
 
     let routerTemplate = `
     //根据配置生成路由
