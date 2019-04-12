@@ -19,7 +19,7 @@ module.exports = function(content) {
             {
               path: "${item.url}",
               name: "${item.name}",
-              component: resolve => require(["$PROJECT/src${item.path}.cml"], resolve)
+              component: function(resolve){return require(["$PROJECT/src${item.path}.cml"], resolve)}
             },
             `
         })

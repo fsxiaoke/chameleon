@@ -159,16 +159,20 @@ module.exports = function (options) {
   // 兼容旧版api
   let apiPrefix = options.apiPrefix || devApiPrefix;
   // 新版api 优先读取domainMap
-  let domainMap = (cml.config.get().domainMap && cml.config.get().domainMap[cml.media]) || {
-    apiPrefix
+  let domainMap = {
+    '':''
   };
   let defaultDomainKey = cml.config.get().defaultDomainKey || 'apiPrefix';
-  if (options.media === 'dev') {
-    // dev模式默认apiPrefix
-    commonConfig.plugins.push(new webpack.DefinePlugin({
-      'process.env.devApiPrefix': JSON.stringify(devApiPrefix)
-    }))
-  }
+    if (options.media === 'dev') {
+        // dev模式默认apiPrefix
+        commonConfig.plugins.push(new webpack.DefinePlugin({
+            'process.env.devApiPrefix': JSON.stringify(apiPrefix)
+        }))
+    } else {
+        commonConfig.plugins.push(new webpack.DefinePlugin({
+            'process.env.devApiPrefix': JSON.stringify('')
+        }))
+    }
   // 兼容旧版api
   commonConfig.plugins.push(new webpack.DefinePlugin({
     'process.env.cmlApiPrefix': JSON.stringify(apiPrefix)
