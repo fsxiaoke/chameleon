@@ -177,7 +177,7 @@ module.exports = function (options) {
     'process.env.domainMap': JSON.stringify(domainMap)
   }))
   commonConfig.plugins.push(new webpack.DefinePlugin({
-    'process.env.defaultDomainKey': JSON.stringify(defaultDomainKey)
+    'process.env.defaultDomainKey': JSON.stringify('')
   }))
   commonConfig.plugins.push(new webpack.DefinePlugin({
     'process.env.media': JSON.stringify(options.media)
