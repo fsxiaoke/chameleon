@@ -186,7 +186,10 @@ module.exports = function (options) {
   commonConfig.plugins.push(new webpack.DefinePlugin({
     'process.env.media': JSON.stringify(options.media)
   }))
-
+  let i18n = cml.config.get().i18n || 'zh-cn';
+  commonConfig.plugins.push(new webpack.DefinePlugin({
+      'process.env.i18n': JSON.stringify(i18n)
+  }))
   if (options.minimize) {
     commonConfig.plugins = commonConfig.plugins.concat([
       new OptimizeCSSPlugin({
