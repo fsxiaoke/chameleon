@@ -524,14 +524,14 @@
                 </p>
               </div>
             </div>
-            <div class="qrcode-item" style="display: none">
+            <div class="qrcode-item">
               <div class="qrcode-title">
                 <img src="./preview-assets/cml-weex.png" alt="">
-                <span> Weex Playground App 效果预览</span>
+                <span> 纷享 App 效果预览</span>
               </div>
               <div class="qrcode-content weex-dev blur-qrcode" id="weex-dev">
                 <a class="qrcode" id="qrcode" target="_blank"></a>
-                <p class="qrcode-tips">用 <a target="_blank" href="https://weex-project.io/playground.html">Weex Playground App</a> 扫码</p>
+                <p class="qrcode-tips">用 <a target="_blank" href="http://jenkins.firstshare.cn/view/Android-pack/job/android-master/">纷享 App</a> 扫码</p>
               </div>
               <div class="qrcode-content" id="weex-no-dev">
                 <div style="text-align:center">
@@ -668,10 +668,20 @@
         })
       }
       //创建weex二维码
+      // function createQRCode(url, path) {
+      //   var $QR = document.querySelector('#qrcode')
+      //   var QR = qrcode(0, 'L')
+      //   url += '?path=' + encodeURIComponent(path)
+      //   $QR.setAttribute('href', url)
+      //   QR.addData(url)
+      //   QR.make()
+      //   $QR.innerHTML = QR.createImgTag(6, 12)
+      // }
+      //创建纷享二维码
       function createQRCode(url, path) {
         var $QR = document.querySelector('#qrcode')
         var QR = qrcode(0, 'L')
-        url += '?path=' + encodeURIComponent(path)
+        url = location.origin + '?debug_host=' + encodeURIComponent(location.host)
         $QR.setAttribute('href', url)
         QR.addData(url)
         QR.make()
