@@ -7,6 +7,7 @@ exports.desc = 'tools for the weex project';
 exports.register = function (commander) {
   commander
     .option('-r, --root [root]', 'specify project root')
+    .option('-f, --file [router name]', 'specify file')
     .action(function (...args) {
       cml.utils.checkProjectConfig();
       /* eslint-disable */
@@ -16,7 +17,6 @@ exports.register = function (commander) {
       /* eslint-disable */
       // 不能删除
       var options = args.pop(); // eslint-disable-line
-
       var cmd = args.shift();
 
       if (cmd) {
@@ -45,6 +45,8 @@ exports.register = function (commander) {
 
 
     })
+
+
   commander.on('--help', function() {
     var cmd = `
   Commands:
