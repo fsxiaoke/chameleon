@@ -47,6 +47,11 @@ module.exports = function (options) {
           publicPath: cml.config.get().weex.publicPath,
           name: `${cml.config.get().staticPath}/[name]${cml.config.get().weex.hash ? '_[hash:7]' : ''}.[ext]`
         }
+      } else if (index === 4) {
+        e.options = {
+          publicPath: cml.config.get().weex.publicPath,
+          name: `${cml.config.get().staticPath}/[name]${cml.config.get().weex.hash ? '_[hash:7]' : ''}.[ext]`
+        }
       }
     })
     configArr.push(merge(weexCommonConfig, buildConfig))
