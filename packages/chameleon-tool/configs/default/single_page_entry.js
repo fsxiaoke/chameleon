@@ -1,4 +1,6 @@
 import instance from '$PROJECT/${PAGE_PATH}';
+import store from "$PROJECT/src/store/index.js";
+
 
 const filter = require('$PROJECT/src/filter')["default"] || [];
 let promise;
@@ -18,12 +20,15 @@ Vue.prototype.$router = {
 }
 if (promise instanceof Promise) {
   promise.then(() => {
-    instance.el = '#root';
-    new Vue(instance);
+    initV();
 
   });
 } else {
-  instance.el = '#root';
-  new Vue(instance);
+  initV();
 }
 
+function initV() {
+  instance.el = '#root';
+  instance.store = store;
+  new Vue(instance);
+}
