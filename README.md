@@ -15,6 +15,8 @@
 - [资源汇总 💰awesome-cml](https://github.com/chameleon-team/awesome-cml)：依赖库、demo、完整应用示例、学习资源
 - [后续规划](https://github.com/didi/chameleon/wiki/%E5%90%8E%E6%9C%9F%E8%A7%84%E5%88%92)
 - [五分钟上手视频教程](https://mp.weixin.qq.com/s/3NY_pbqDVnbQSYQG_D2qiA)
+- [青桔单车 chameleon 跨平台实践分享](https://mp.weixin.qq.com/s/N8PpxRHHtlIHVlemQ1Gepg)
+- [谁在使用？](https://github.com/didi/chameleon/issues/131)
 
 ## 仓库更新说明
 
@@ -45,7 +47,7 @@
 ## 背景
 
 研发同学在端内既追求 h5 的灵活性，也要追求性能趋近于原生。
-面对入口扩张，主端、独立端、微信小程序、支付宝小程序、百度小程序、Android 厂商联盟快应用，单一功能在各平台都要重复实现，开发和维护成本成倍增加。迫切需要维护一套代码可以构建多入口的解决方案，滴滴跨端解决方案 Chameleon 终于发布。真正专注于让一套代码运行多端。
+面对入口扩张，App 客户端、微信小程序、支付宝小程序、百度小程序、Android 厂商联盟快应用、其他类小程序，单一功能在各平台都要重复实现，开发和维护成本成倍增加。迫切需要维护一套代码可以构建多入口的解决方案，滴滴跨端解决方案 Chameleon 终于发布。真正专注于让一套代码运行多端。
 
 ## 设计理念
 
@@ -114,7 +116,7 @@ Chameleon 不仅仅是跨端解决方案。基于优秀的前端打包工具 Web
 内部成员：透心凉、Sgoddon、动机不纯、Jalon、Jack、卡尺哈哈、change、Observer、Kevin、guoqingSmile、Mr.MY、JiM、lzc、名字待定、朱智恒、亭、龚磊、w55、小龙、不懂小彬、荣景超
 
 贡献参与者：
-快应用研发团队、broven、Jeany、luyixin、z-mirror、夏夜焰火
+快应用官方研发团队、broven（阿里）、Jeany（芒果 TV）、luyixin、z-mirror、夏夜焰火（百度）
 
 ## 微信 & QQ 交流群
 

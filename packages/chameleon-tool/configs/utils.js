@@ -456,7 +456,15 @@ exports.getWeexEntry = function (options) {
       })
     }
   }
-
+  if (options.media === 'dev') {
+    exports.copyWeexLiveLoadFile(options.root, 'weex', options.media);
+    entryFile.push(path.join(cml.projectRoot, 'node_modules/chameleon-runtime/.temp/weex_liveload_entry.js'));
+  }
+  if (options.babelPolyfill === true) {
+    entryFile.unshift(path.join(__dirname, 'default/miniappPolyfill.js'));
+  }
+  var entryName = exports.getEntryName();
+  entry[entryName] = entryFile;
   return entry;
 }
 
@@ -567,6 +575,12 @@ exports.copyDefaultFile = function (dir, platform, media) {
     overwrite: true
   })
 
+}
+
+exports.copyWeexLiveLoadFile = function(dir, platform, media) {
+  fse.copySync(path.resolve(__dirname, './default/weex_liveload_entry.js'), path.resolve(dir, 'node_modules/chameleon-runtime/.temp/weex_liveload_entry.js'), {
+    overwrite: true
+  })
 }
 
 let webServerPort;
