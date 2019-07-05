@@ -161,7 +161,7 @@ module.exports = function (options) {
   }
   let devApiPrefix = `http://${config.ip}:${webServerPort}`
   // 兼容旧版api
-  let apiPrefix = options.apiPrefix || devApiPrefix;
+  let apiPrefix = options.apiPrefix ? options.apiPrefix : options.autoJoinIfApiPrefixNull ? devApiPrefix : '';
   // 新版api 优先读取domainMap
   // 浅拷贝不影响config中的domain
   let domain = {};
