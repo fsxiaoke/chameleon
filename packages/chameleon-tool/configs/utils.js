@@ -435,10 +435,14 @@ exports.getWeexEntry = function (options) {
       entryFile.push(path.join(cml.projectRoot, 'node_modules/chameleon-runtime/.temp/entry.js'));
     }
     if (options.media === 'dev') {
-      entryFile.push(path.join(cml.root, 'configs/weex_liveload/liveLoad.js'))
-    }
-    var entryName = exports.getEntryName();
-    entry[entryName] = entryFile;
+    exports.copyWeexLiveLoadFile(options.root, 'weex', options.media);
+    entryFile.push(path.join(cml.projectRoot, 'node_modules/chameleon-runtime/.temp/weex_liveload_entry.js'));
+  }
+  if (options.babelPolyfill === true) {
+    entryFile.unshift(path.join(__dirname, 'default/miniappPolyfill.js'));
+  }
+  var entryName = exports.getEntryName();
+  entry[entryName] = entryFile;
   } else {
     let {routerConfig, hasError} = cml.utils.getRouterConfig();
     if (!hasError) {
@@ -456,15 +460,7 @@ exports.getWeexEntry = function (options) {
       })
     }
   }
-  if (options.media === 'dev') {
-    exports.copyWeexLiveLoadFile(options.root, 'weex', options.media);
-    entryFile.push(path.join(cml.projectRoot, 'node_modules/chameleon-runtime/.temp/weex_liveload_entry.js'));
-  }
-  if (options.babelPolyfill === true) {
-    entryFile.unshift(path.join(__dirname, 'default/miniappPolyfill.js'));
-  }
-  var entryName = exports.getEntryName();
-  entry[entryName] = entryFile;
+ 
   return entry;
 }
 

@@ -10,7 +10,7 @@ module.exports = function (options) {
     media,
     root
   } = options;
-  let isWrapComponent = cml.config.get().web[media] && cml.config.get().web[media].isWrapComponent === true
+  let isWrapComponent = cml.config.get().weex[media] && cml.config.get().weex[media].isWrapComponent === true
 
   let outputPath = path.join(utils.getDevServerPath(), 'weex');
   let cmlLoaders = [{

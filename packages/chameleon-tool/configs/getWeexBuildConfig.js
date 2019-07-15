@@ -20,12 +20,12 @@ module.exports = function (options) {
   const weexCommonConfig = getWeexCommonConfig(options);
   const configArr = []
   Object.keys(entry).forEach(key => {
-
-
+    let {routerConfig} = cml.utils.getRouterConfig();
     if (argv[3] === 'build' && (argv[4] === '-f' || argv[4] === '--file') && key !== argv[5]) {
       return;
     }
-
+    let bundleName = routerConfig.routes.find(e => e.name === key).bundleName || '';
+    bundleName = bundleName.replace(/\//g, '+');
     var buildConfig = {
       output: {
         path: `${outputPath}/${key}`,
@@ -34,7 +34,7 @@ module.exports = function (options) {
       plugins: [
         new CleanWebpackPlugin(['./*'], {root: outputPath, verbose: false}),
         new ZipPlugin({
-          filename: `${key}.zip`
+          filename: `${bundleName || key}.zip`
         })
       ]
     }
