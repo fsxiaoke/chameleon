@@ -13,24 +13,29 @@ module.exports = function (options) {
   let isWrapComponent = cml.config.get().weex[media] && cml.config.get().weex[media].isWrapComponent === true
 
   let outputPath = path.join(utils.getDevServerPath(), 'weex');
-  let cmlLoaders = [{
-    loader: 'chameleon-weex-vue-loader',
-    options: {
-      ...cmlLoaderConfig,
-      esModule: true
-    }
-  },
+  let cmlLoaders = [
 
-  {
-    loader: 'chameleon-loader',
-    options: { ...cmlLoaderConfig,
-      cmlType: 'weex',
-      media,
-      check: cml.config.get().check,
-      isInjectBaseStyle: cml.config.get().baseStyle.weex === true,
-      isWrapComponent
-    }
-  }]
+    {
+      loader: 'chameleon-weex-vue-loader',
+      options: {
+        ...cmlLoaderConfig,
+        esModule: true
+      }
+    },
+
+    {
+      loader: 'chameleon-loader',
+      options: { ...cmlLoaderConfig,
+        cmlType: 'weex',
+        media,
+        check: cml.config.get().check,
+        isInjectBaseStyle: cml.config.get().baseStyle.weex === true,
+        isWrapComponent
+      }
+    },
+    {
+      loader: path.join(__dirname, 'extendsLoader.js')
+    }]
   let commonConfig =
   {
     context: path.resolve(root),
