@@ -17,13 +17,46 @@ module.exports = function(content) {
   if (!extendFileChains.length) {
     return content;
   }
-  while (extendFileChains.length > 1) {
+  if (extendFileChains.length > 1) {
+    while (extendFileChains.length > 1) {
+      let extendFile = extendFileChains.pop();
+      let subFile = extendFileChains.pop();
+      let merged = merge(extendFile, subFile);
+      extendFileChains.push({file: merged, path: subFile.path});
+    }
+  } else if (extendFileChains.length === 1) {
     let extendFile = extendFileChains.pop();
-    let subFile = extendFileChains.pop();
-    let merged = merge(extendFile, subFile);
-    extendFileChains.push({file: merged, path: subFile.path});
+    let extendParts = cmlUtils.splitParts({content: extendFile.file});
+    let template = extendParts.template[0].tagContent;
+    let js = extendParts.script.find(e => e.cmlType !== 'json').tagContent;
+    let style = extendParts.style[0].tagContent;
+    let json = JSON.parse(extendParts.script.find(e => e.cmlType === 'json').content);
+    let comps = json.base && json.base.usingComponents
+    if (comps) {
+      Object.keys(comps).forEach(key => {
+        if (comps[key].indexOf('..') === 0) {
+          let absolutePath = path.resolve(path.dirname(extendFile.path), comps[key])
+          comps[key] = absolutePath;
+        } else if (comps[key].indexOf('/') === 0) {
+          let absolutePath = path.resolve(cml.projectRoot + '/src', comps[key].substring(1))
+          comps[key] = absolutePath;
+        } else {
+          let absolutePath = path.resolve(cml.projectRoot + '/node_modules', comps[key])
+          comps[key] = absolutePath;
+        }
+      })
+    }
+    extendFileChains.push({
+      file: `${template}
+      ${js}
+      ${style}
+      <script cml-type="json">${JSON.stringify(json)}</script>
+      `,
+      path: extendFile.path
+    })
   }
-  let output = merge(extendFileChains[0], {file: content, path: this.resourcePath}, options.cmlType)
+
+  let output = merge(extendFileChains[0], {file: content, path: this.resourcePath}, options.cmlType);
   return output;
 
 }
@@ -191,13 +224,14 @@ function mergeDestComponents(extendFile, subFile, ast, cmlType) {
     let absolutePath = '';
     let strArray = [];
     Object.keys(extendComp).forEach(key => {
-      if (extendComp[key].indexOf('..') === 0) {
-        absolutePath = path.resolve(path.dirname(extendFile.path), extendComp[key])
-      } else if (extendComp[key].indexOf('/') === 0) {
-        absolutePath = path.resolve(cml.projectRoot + '/src', extendComp[key].substring(1))
-      } else {
-        absolutePath = extendComp[key];
-      }
+      // if (extendComp[key].indexOf('..') === 0) {
+      //   absolutePath = path.resolve(path.dirname(extendFile.path), extendComp[key])
+      // } else if (extendComp[key].indexOf('/') === 0) {
+      //   absolutePath = path.resolve(cml.projectRoot + '/src', extendComp[key].substring(1))
+      // } else {
+      //   absolutePath = extendComp[key];
+      // }
+      absolutePath = extendComp[key];
       cmlUtils.isFile(absolutePath + '.cml') ? absolutePath = absolutePath + '.cml' : absolutePath = absolutePath + `.${cmlType}.cml`
       absolutePath = absolutePath.replace(/\\/g, '\\\\')
       strArray.push(`"${key}":require("${absolutePath}").default`)
