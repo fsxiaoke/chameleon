@@ -129,6 +129,8 @@ function mergeScript(src, sub) {
   mergeObject(srcParts.methods, subParts.methods, srcParts, subParts);
   mergeObject(srcParts.computed, subParts.computed, srcParts, subParts);
   mergeObject(srcParts.watch, subParts.watch, srcParts, subParts);
+  mergeObject(srcParts.props, subParts.props, srcParts, subParts);
+
   const lifeCycles = ['beforeCreate', 'created', 'beforeMount', 'mounted', 'beforeDestory', 'destoryed'];
   lifeCycles.forEach(e => {
     mergeMethod(srcParts[e], subParts[e], srcParts, subParts)
