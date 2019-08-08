@@ -34,7 +34,10 @@ module.exports = function (options) {
       }
     },
     {
-      loader: path.join(__dirname, 'extendsLoader.js')
+      loader: path.join(__dirname, 'extendsLoader.js'),
+      options:{
+        cmlType: 'weex',
+      }
     }]
   let commonConfig =
   {

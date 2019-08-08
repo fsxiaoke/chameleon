@@ -3,7 +3,11 @@ var core = require('@babel/core');
 var cmlUtils = require('chameleon-tool-utils');
 var path = require('path');
 var fs = require('fs');
+var loaderUtils = require('loader-utils');
+var lodashMerge = require('lodash.merge');
+
 module.exports = function(content) {
+  const options = loaderUtils.getOptions(this) || {};
   let parts = cmlUtils.splitParts({content});
   let srcJson = JSON.parse(parts.script.find(e => e.cmlType === 'json').content);
   if (!srcJson["extends"]) {
@@ -13,49 +17,36 @@ module.exports = function(content) {
   if (!extendFileChains.length) {
     return content;
   }
-  // let extendParts = cmlUtils.splitParts({content: extendFile});
-  // let sourceAst = getAst(extendParts);
-  // let mergeAst = getAst(parts);
-  // mergeScript(sourceAst, mergeAst)
-  // let {code} = core.transformFromAstSync(sourceAst);
-  // let template = parts.template[0].content.trim() ? parts.template[0].tagContent : extendParts.template[0].tagContent;
-  // let js = `<script>${code}</script>`;
-  // let style = parts.style[0].content.trim() ? parts.style[0].tagContent : extendParts.style[0].tagContent;
-  // let extendJson = JSON.parse(extendParts.script.find(e => e.cmlType === 'json').content);
-  // Object.assign(extendJson, srcJson);
-  // delete extendJson["extends"];
-  // let json = `<script cml-type="json">${JSON.stringify(extendJson)}</script>`;
-  // let output =
-  // `${template}
-  // ${js}
-  // ${style}
-  // ${json}`;
   while (extendFileChains.length > 1) {
     let extendFile = extendFileChains.pop();
     let subFile = extendFileChains.pop();
     let merged = merge(extendFile, subFile);
-    extendFileChains.push(merged);
+    extendFileChains.push({file: merged, path: subFile.path});
   }
-  let output = merge(extendFileChains[0], content)
+  let output = merge(extendFileChains[0], {file: content, path: this.resourcePath}, options.cmlType)
   return output;
 
 }
-function merge(extendFile, subFile) {
-  let parts = cmlUtils.splitParts({content: subFile});
-  let srcJson = JSON.parse(parts.script.find(e => e.cmlType === 'json').content);
-  let extendParts = cmlUtils.splitParts({content: extendFile});
+function merge(extendFile, subFile, cmlType) {
+  let parts = cmlUtils.splitParts({content: subFile.file});
+  let extendParts = cmlUtils.splitParts({content: extendFile.file});
   let sourceAst = getAst(extendParts);
   let mergeAst = getAst(parts);
   mergeScript(sourceAst, mergeAst);
   mergeOutScript(sourceAst, mergeAst);
+  let json = '';
+  if (!cmlType) {
+    let jsonObject = mergeComponents(extendFile, subFile)
+    json = `<script cml-type="json">${JSON.stringify(jsonObject)}</script>`;
+  } else {
+    mergeDestComponents(extendFile, subFile, sourceAst, cmlType);
+    json = `<script cml-type="json">${parts.script.find(e => e.cmlType === 'json').content}</script>`;
+  }
   let {code} = core.transformFromAstSync(sourceAst);
   let template = parts.template[0].content.trim() ? parts.template[0].tagContent : extendParts.template[0].tagContent;
   let js = `<script>${code}</script>`;
   let style = parts.style[0].content.trim() ? parts.style[0].tagContent : extendParts.style[0].tagContent;
-  let extendJson = JSON.parse(extendParts.script.find(e => e.cmlType === 'json').content);
-  Object.assign(extendJson, srcJson);
-  delete extendJson["extends"];
-  let json = `<script cml-type="json">${JSON.stringify(extendJson)}</script>`;
+
   let output =
     `${template}
   ${js}
@@ -72,9 +63,12 @@ function getExtendsFileChains(parts, subPath) {
       break;
     }
     let file = fs.readFileSync(path.resolve(path.dirname(subPath), filePath) + '.cml', {encoding: 'utf-8'})
-    result.push(file)
+    result.push({
+      file,
+      path: path.resolve(path.dirname(subPath), filePath) + '.cml'
+    })
     parts = cmlUtils.splitParts({content: file});
-    subPath = filePath;
+    subPath = path.resolve(path.dirname(subPath), filePath) + '.cml';
   }
   return result
 }
@@ -153,6 +147,82 @@ function mergeOutScript(src, sub) {
   })
   subAst.imports.forEach(e => src.program.body.unshift(e))
 }
+function mergeComponents(extendFile, subFile) {
+  let parts = cmlUtils.splitParts({content: subFile.file});
+  let extendParts = cmlUtils.splitParts({content: extendFile.file});
+  let sub = JSON.parse(parts.script.find(e => e.cmlType === 'json').content);
+  let extend = JSON.parse(extendParts.script.find(e => e.cmlType === 'json').content);
+  let subComp = sub.base && sub.base.usingComponents;
+  let extendComp = extend.base && extend.base.usingComponents
+  if (extendComp) {
+    toSrcPath(extendComp, extendFile.path)
+  }
+  if (subComp) {
+    toSrcPath(subComp, subFile.path)
+  }
+  return lodashMerge(extend, sub)
+  function toSrcPath(comps, filePath) {
+    Object.keys(comps).forEach(key => {
+      if (comps[key].indexOf('..') === 0) {
+        let absolutePath = path.resolve(path.dirname(filePath), comps[key])
+        comps[key] = absolutePath;
+      } else if (comps[key].indexOf('/') === 0) {
+        let absolutePath = path.resolve(cml.projectRoot + '/src', comps[key].substring(1))
+        comps[key] = absolutePath;
+      }
+    })
+  }
+
+}
+function mergeDestComponents(extendFile, subFile, ast, cmlType) {
+  let parts = cmlUtils.splitParts({content: subFile.file});
+  let extendParts = cmlUtils.splitParts({content: extendFile.file});
+  let sub = JSON.parse(parts.script.find(e => e.cmlType === 'json').content);
+  let extend = JSON.parse(extendParts.script.find(e => e.cmlType === 'json').content);
+  let subComp = sub.base && sub.base.usingComponents;
+  let extendComp = extend.base && extend.base.usingComponents;
+  let config = getRealVueConifg(ast);
+  if (extendComp) {
+    let absolutePath = '';
+    let strArray = [];
+    Object.keys(extendComp).forEach(key => {
+      if (extendComp[key].indexOf('..') === 0) {
+        absolutePath = path.resolve(path.dirname(extendFile.path), extendComp[key])
+      } else if (extendComp[key].indexOf('/') === 0) {
+        absolutePath = path.resolve(cml.projectRoot + '/src', extendComp[key].substring(1))
+      } else {
+        absolutePath = extendComp[key];
+      }
+      cmlUtils.isFile(absolutePath + '.cml') ? absolutePath = absolutePath + '.cml' : absolutePath = absolutePath + `.${cmlType}.cml`
+      absolutePath = absolutePath.replace(/\\/g, '\\\\')
+      strArray.push(`"${key}":require("${absolutePath}").default`)
+    })
+    let code = `export default {${strArray.join(',')}}`;
+    let codeAst = parser.parse(code, {
+      sourceType: 'module'
+    })
+    let props = getRealBody(config);
+    let cstrFun = config.constructor;
+    if (config.type === 'ExportDefaultDeclaration') {
+      let tmp = new cstrFun()
+      tmp.type = 'ObjectProperty';
+      tmp.key = new cstrFun();
+      tmp.key.type = 'Identifier';
+      tmp.key.name = 'components';
+      tmp.value = codeAst.program.body[0].declaration;
+      props.unshift(tmp)
+    } else {
+      let tmp = new cstrFun()
+      tmp.type = 'ClassProperty';
+      tmp.key = new cstrFun();
+      tmp.key.type = 'Identifier';
+      tmp.key.name = 'components';
+      tmp.value = codeAst.program.body[0].declaration;
+      props.unshift(tmp)
+    }
+  }
+
+}
 function spiltPart(ast) {
   let srcTree = getRealVueConifg(ast);
   let parts = {}
@@ -176,7 +246,7 @@ function mergeObject(src, sub, srcParts, subParts) {
   }
   if (!src && sub) {
     sub.type = srcParts.ast.type === 'ExportDefaultDeclaration' ? 'ObjectProperty' : 'ClassProperty'
-    srcParts.ast.declaration.properties.push(sub)
+    getRealBody(srcParts.ast).push(sub)
   } else if (src && sub) {
     let srcProps = src.value.properties;
     let subProps = sub.value.properties;
@@ -232,5 +302,12 @@ function mergeMethod(src, sub, srcParts, subParts) {
     express.params = new Array();
     express.body = sub.body;
     body.unshift(express);
+  }
+}
+function getRealBody(ast) {
+  if (ast.type === 'ClassDeclaration') {
+    return ast.body.body
+  } else {
+    return ast.declaration.properties
   }
 }
