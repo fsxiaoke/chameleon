@@ -171,6 +171,9 @@ function mergeComponents(extendFile, subFile) {
       } else if (comps[key].indexOf('/') === 0) {
         let absolutePath = path.resolve(cml.projectRoot + '/src', comps[key].substring(1))
         comps[key] = absolutePath;
+      } else {
+        let absolutePath = path.resolve(cml.projectRoot + '/node_modules', comps[key])
+        comps[key] = absolutePath;
       }
     })
   }
