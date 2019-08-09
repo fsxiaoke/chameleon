@@ -22,7 +22,12 @@ module.exports = function (options) {
         esModule: true
       }
     },
-
+    {
+      loader: path.join(__dirname, 'extendsLoader.js'),
+      options:{
+        cmlType: 'weex',
+      }
+    },
     {
       loader: 'chameleon-loader',
       options: { ...cmlLoaderConfig,
@@ -33,12 +38,7 @@ module.exports = function (options) {
         isWrapComponent
       }
     },
-    {
-      loader: path.join(__dirname, 'extendsLoader.js'),
-      options:{
-        cmlType: 'weex',
-      }
-    }]
+   ]
   let commonConfig =
   {
     context: path.resolve(root),
