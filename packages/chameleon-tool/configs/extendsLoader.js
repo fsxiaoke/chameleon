@@ -14,8 +14,10 @@ module.exports = function(content) {
   } else {
     template = parts.template[0].tagContent;
   }
-  let js = parts.script.find(e => e.cmlType !== 'json').tagContent;
-  let style = parts.style[0].tagContent;
+  let js = parts.script.find(e => e.cmlType !== 'json')
+  js = js ? js.tagContent : '';
+  let style = parts.style[0];
+  style = style ? style.tagContent : '';
   // const options = loaderUtils.getOptions(this) || {};
   // let srcJson = JSON.parse(parts.script.find(e => e.cmlType === 'json').content);
   // if (!srcJson["extends"]) {

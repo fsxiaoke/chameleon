@@ -56,6 +56,9 @@ module.exports = function(options) {
     }
   },
   {
+    loader: path.join(__dirname, 'customLoader.js')
+  },
+  {
     loader: 'chameleon-loader',
     options: {
       ...getCmlLoaderConfig({ type: 'web', disableExtract }),
