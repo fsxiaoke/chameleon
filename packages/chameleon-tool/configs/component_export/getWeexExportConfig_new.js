@@ -1,9 +1,10 @@
 
 const merge = require('webpack-merge');
+
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const getWeexCommonConfig = require('../getWeexCommonConfig');
-const { styleLoaders, getBabelPath } = require('../utils');
+const { styleLoaders, getBabelPath, getWeexEntry} = require('../utils');
 const getCmlLoaderConfig = require('../cml-loader.conf');
 const ExportPlugin = require('./exportPlugin');
 
@@ -54,6 +55,7 @@ module.exports = function(options) {
   }]
 
   const exportConfig = {
+    entry: getWeexEntry(options),
     output: {
       path: outputPath,
       publicPath,
