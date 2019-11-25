@@ -42,6 +42,13 @@ module.exports = function (options) {
   },
 
   {
+    loader: path.join(__dirname, 'extendsLoader.js'),
+    options:{
+      cmlType: 'weex',
+    }
+  },
+
+  {
     loader: 'chameleon-loader',
     options: { ...getCmlLoaderConfig({type: 'web', disableExtract}),
       cmlType: 'web',
