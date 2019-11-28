@@ -1,6 +1,6 @@
 import instance from '$PROJECT/${PAGE_PATH}';
 import store from "$PROJECT/src/store/index.js";
-let limitedVersion =  '${VERSION}
+let limitedVersion =  '${VERSION}';
 
 const filter = require('$PROJECT/src/filter')["default"] || [];
 let promise;
@@ -31,6 +31,7 @@ function initV() {
   if(weex && weex.config.env.appVersionCode < limitedVersion){
     let page = weex.requireModule('PageApiModule');
     page.startPage('fs://app/upgrade',{});
+    page.finish();
     return;
   }
   instance.el = '#root';

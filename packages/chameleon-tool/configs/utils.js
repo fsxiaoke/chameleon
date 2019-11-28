@@ -449,7 +449,7 @@ exports.getWeexEntry = function (options) {
       routerConfig.routes.forEach(item => {
         let name = item.name
         let entryStr = fs.readFileSync(path.resolve(__dirname, './default/single_page_entry.js'), {encoding: 'utf-8'});
-        entryStr = entryStr.replace('${PAGE_PATH}', `src/${item.path}.cml`).replace('${VERSION}',`${item.limitedVersion}`);
+        entryStr = entryStr.replace('${PAGE_PATH}', `src/${item.path}.cml`).replace('${VERSION}',`${item.limitedVersion || 0 }`);
         try {
           fs.accessSync(path.join(cml.projectRoot, `node_modules/chameleon-runtime/.temp`));
         } catch (err) {
