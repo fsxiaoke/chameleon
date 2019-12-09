@@ -1,0 +1,17 @@
+{
+  "name": "mvvm-cml-loader",
+  "version": "1.0.3",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chameleon-Team",
+  "license": "Apache",
+  "dependencies": {
+    "chameleon-loader": "1.0.3",
+    "chameleon-tool-utils": "1.0.3",
+    "loader-utils": "1.1.0",
+    "mvvm-template-parser": "1.0.3"
+  }
+}

@@ -17,6 +17,7 @@ const cmlUtils = require('chameleon-tool-utils');
 const prehandle = require('./utils/prehandle.js');
 const loaderMethods = require('./loaderMethods');
 const miniAppScript = require('./miniapp-script.js');
+const loadIcon = require('./load-icon.js');
 let jsonObject = {};
 
 module.exports = function (content) {
@@ -49,8 +50,26 @@ module.exports = function (content) {
   }
 
   //loader的类型  wx  web weex
-  const {cmlType, media, builtinNpmName, cmss = defaultCmss, isInjectBaseStyle = true,isWrapComponent = true} = options;
-  options.isInjectBaseStyle = isInjectBaseStyle;
+  const {cmlType, media, builtinNpmName, cmss = defaultCmss, isWrapComponent = true, subProject = []} = options;
+  let { isInjectBaseStyle = true } = options;
+  //处理拿到json对象, 使用baseStyle来配置是否注入基础样式
+  jsonObject = cmlUtils.getJsonFileContent(self.resourcePath, cmlType);
+  
+  // 处理子项目的isInjectBaseStyle
+  if (subProject.length) {
+    subProject.forEach(item => {
+      if (self.resourcePath.indexOf(item.npmName) > -1 && item.isInjectBaseStyle !== undefined) {
+        isInjectBaseStyle = item.isInjectBaseStyle;
+      }
+    })
+  }
+
+  
+  if (jsonObject && jsonObject.baseStyle !== undefined) {
+    isInjectBaseStyle = jsonObject.baseStyle;
+  }
+
+  
   if(isInjectBaseStyle && cmlType === 'weex') {
     content = prehandle.injectWeexBaseStyle(content, self);
   }
@@ -74,13 +93,12 @@ module.exports = function (content) {
     process.cwd()
   )
 
-  //处理拿到json对象
-  jsonObject = cmlUtils.getJsonFileContent(self.resourcePath, cmlType);
   //是否是引用的原生小程序组件  wxml文件
   const isWxmlComponent = extName === '.wxml';
   const isAxmlComponent = extName === '.axml';
   const isSwanComponent = extName === '.swan';
-  const isMiniAppRawComponent = isWxmlComponent ||  isAxmlComponent || isSwanComponent;
+  const isQmlComponent = extName === '.qml';
+  const isMiniAppRawComponent = isWxmlComponent ||  isAxmlComponent || isSwanComponent || isQmlComponent;
   if(!isMiniAppRawComponent) {
     //处理script cml-type为json的内容
     content = cmlUtils.deleteScript({content, cmlType: 'json'});
@@ -88,9 +106,8 @@ module.exports = function (content) {
   // 如果是web端 默认添加scoped属性
   // 如果是weex端 默认添加全局样式
   //判断是否是内置组件
-  const isBuildInFile = cmlUtils.isBuildIn(filePath);
-
-
+  const isBuildInFile = cmlUtils.isBuildIn(filePath, cmlType, context);
+  
   const shortFilePath = path.relative(context, filePath).replace(/^(\.\.[\\\/])+/, '')
   var hashNum = hash(isProduction ? (shortFilePath + '\n' + content) : shortFilePath)
 
@@ -145,10 +162,11 @@ module.exports = function (content) {
     wx: 'wxml',
     alipay: 'axml',
     baidu: 'swan',
+    qq: 'qml'
   }
   //小程序模板后缀正则
-  const miniTplExtReg = /(\.wxml|\.axml)$/;
-  const miniCmlReg = /(\.cml|\.wx\.cml|\.alipay\.cml| |\.baidu\.cml)$/;
+  const miniTplExtReg = /(\.wxml|\.axml|\.swan|\.qml)$/;
+  const miniCmlReg = /(\.cml|\.wx\.cml|\.alipay\.cml|\.qq\.cml|\.baidu\.cml)$/;
 
   if(isMiniAppRawComponent) {
     miniAppRawComponentHandler.call(this);
@@ -156,6 +174,7 @@ module.exports = function (content) {
       //handler中改变output的值 最后返回output
       switch (cmlType) {
         case 'wx':
+        case 'qq':
         case 'alipay':
         case 'baidu':
           miniAppHandler.call(this);
@@ -190,8 +209,7 @@ module.exports = function (content) {
 
   // 引用微信小程序组件处理
   function miniAppRawComponentHandler() {
-    
-    if((cmlType === 'wx' && extName === '.wxml') || (cmlType === 'alipay' && extName === '.axml') || (cmlType === 'baidu' && extName === '.swan')) {
+    if((cmlType === 'wx' && extName === '.wxml') || (cmlType === 'alipay' && extName === '.axml') || (cmlType === 'baidu' && extName === '.swan') || (cmlType === 'qq' && extName === '.qml')) {
       //生成json文件
       let jsonFile = filePath.replace(miniTplExtReg,'.json');
       if(!cmlUtils.isFile(jsonFile)) {
@@ -222,7 +240,6 @@ module.exports = function (content) {
     npmComponents.forEach(item=>{
       componentDeps.push(item.filePath);
     })
-
     let newJsonObj = jsonHandler(self, jsonObject, cmlType, componentDeps) || {};
     newJsonObj.usingComponents = newJsonObj.usingComponents || {};
     let usingComponents ={} ;
@@ -235,6 +252,7 @@ module.exports = function (content) {
     })
 
     usingComponents = prepareParseUsingComponents(usingComponents);
+    
     //cml 编译出wxml模板
     if (type !== 'app') {
       let parseTemplate = parts.template && parts.template[0];
@@ -268,9 +286,13 @@ module.exports = function (content) {
     Object.keys(newJsonObj.usingComponents).forEach(key=>{
       newJsonObj.usingComponents[key] = cmlUtils.handleSpecialChar(newJsonObj.usingComponents[key])
     });
+    //处理tabbar中配置的icon路径
+    if(type == 'app'){
+      loadIcon.handleApptabbar(newJsonObj,filePath,cmlType)
+    }
     let jsonResult = JSON.stringify(newJsonObj, '', 4);
     self.emitFile(emitJsonPath, jsonResult);
-
+    
     //cml
     parts.styles.forEach(function (style, i) {
       //微信小程序在使用组件的时候 不支持属性选择器
@@ -341,10 +363,20 @@ module.exports = function (content) {
     const parseScript = (parts.script && parts.script[0]) || {};
     const scriptContent = parseScript.content || '';
     let newTemplate = handleTemplate();
+    // if(type === 'app') {
+    //   newTemplate = newTemplate.replace(/<app[\s\S]*?\/app>/,`<div class="app" bubble="true">
+    //   <router-view ></router-view> 
+    // </div>`)
+    
+    // }
     if(type === 'app') {
-      newTemplate = newTemplate.replace(/<app[\s\S]*?\/app>/,`<div class="app" bubble="true">
-      <router-view ></router-view> 
-    </div>`)
+      if (cmlType == 'web') {
+        newTemplate = newTemplate.replace(/<app[\s\S]*?\/app>/,`<router-view class="app" bubble="true"></router-view> `)
+      } else {
+        newTemplate = newTemplate.replace(/<app[\s\S]*?\/app>/,`<div class="app" bubble="true">
+        <router-view ></router-view> 
+        </div>`)
+      }
       // newTemplate = `<template><view><router-view></router-view></view></template>`
     }
     let newScript = handleVueScript();

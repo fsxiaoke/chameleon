@@ -1,10 +1,8 @@
 #! /usr/bin/env node
 
-var commander = require('commander');
-var cmlpackage = require('../package.json');
-
-var argv = process.argv;
-
+const commander = require('commander');
+const cmlpackage = require('../package.json');
+const argv = process.argv;
 module.exports.run = function () {
 
   var first = argv[2];
@@ -12,15 +10,17 @@ module.exports.run = function () {
     cml.log.notice(`current running chameleon(${cml.root})`)
     version();
   } else {
+    let extCommand = require('../commanders/ext/index.js').name;
     commander.usage('[command] [options]')
     commander.version(`${cmlpackage.name}@${cmlpackage.version}`)
-    let cmdList = ['init', 'dev', 'build', 'server', 'web', 'weex', 'wx', 'baidu', 'alipay'];
-    cmdList = cmdList.map(key => {
-      return {
-        key: 'key',
-        cmd: require(`../commanders/${key}/index.js`) // eslint-disable-line 
-      }
-    })
+    let cmdList = ['init', 'dev', 'build', 'server', 'web', 'weex', 'wx', 'baidu', 'alipay', 'qq'];
+    if (typeof extCommand === 'string') {
+      cmdList.push('ext');
+    }
+    cmdList = cmdList.map(key => ({
+      key,
+          cmd: require(`../commanders/${key}/index.js`) // eslint-disable-line 
+    }))
 
     cmdList.forEach(item => {
       let cmd = item.cmd;

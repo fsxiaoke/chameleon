@@ -1,10 +1,11 @@
-
 exports.name = 'dev';
 exports.usage = '';
 exports.desc = 'start dev mode';
 
+/* istanbul ignore next */
 exports.register = function (commander) {
   commander
+    .option('-n, --nopreview ', "don't auto open preview")
     .action(function (...args) {
       cml.utils.checkProjectConfig();
       /* eslint-disable */ 

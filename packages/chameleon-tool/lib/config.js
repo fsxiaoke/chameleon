@@ -6,12 +6,27 @@ moduleIdType 决定webpack打包模块的id
   name 利用webpack.NamedModulesPlugin()
   chameleon 利用chameleon-webpack-plugin 中开启moduleid的处理
 */
+function clone (value) {
+  if (Array.isArray(value)) {
+    return value.map(clone)
+  } else if (value && typeof value === 'object') {
+    const res = {}
+    // eslint-disable-next-line guard-for-in
+    for (const key in value) {
+      res[key] = clone(value[key])
+    }
+    return res
+  } else {
+    return value
+  }
+}
 var miniappConfig = {
   dev: {
     moduleIdType: 'name',
     definePlugin: {
       'process.env.NODE_ENV': JSON.stringify('development')
     }
+    //  increase:true, 是否增量部署打包代码
   },
   build: {
     hash: true,
@@ -53,7 +68,8 @@ var chameleonConfig = {
     web: true,
     weex: true,
     alipay: true,
-    baidu: true
+    baidu: true,
+    qq: true
   },
   proxy: {
     enable: false,
@@ -86,9 +102,10 @@ var chameleonConfig = {
     // 是否对css开启autoprefix，默认为true  非weex端生效
     enableAutoPrefix: true
   },
-  wx: miniappConfig,
-  alipay: miniappConfig,
-  baidu: miniappConfig,
+  wx: clone(miniappConfig),
+  alipay: clone(miniappConfig),
+  baidu: clone(miniappConfig),
+  qq: clone(miniappConfig),
   web: {
     dev: {
       isWrapComponent: false, // 默认bu对组件进行一层包裹
@@ -97,6 +114,7 @@ var chameleonConfig = {
       hot: false,
       analysis: false,
       // apiPrefix: ,
+      // staticPath: '', 静态资源路径前缀
       definePlugin: {
         'process.env.NODE_ENV': JSON.stringify('development')
       }
@@ -165,18 +183,17 @@ module.exports = _;
 _.get = function() {
   if (chameleonConfig.base) {
     let baseConfig = chameleonConfig.base;
-    let platforms = ['wx', 'web', 'alipay', 'baidu', 'weex'];
-    if (baseConfig) {
-      platforms.forEach(platform => {
-        if (chameleonConfig[platform]) {
-          let base = JSON.parse(JSON.stringify(baseConfig));
-          let newConfig = JSON.parse(JSON.stringify(chameleonConfig[platform]));
-          utils.merge(base, newConfig);
-          chameleonConfig[platform] = base;
-        }
-      })
-      delete chameleonConfig.base;
-    }
+    let platforms = chameleonConfig.platforms;
+    let extPlatform = chameleonConfig.extPlatform || {};
+    platforms = platforms.concat(Object.keys(extPlatform));
+    platforms.forEach(platform => {
+      if (chameleonConfig[platform]) {
+        let base = JSON.parse(JSON.stringify(baseConfig));
+        let newConfig = JSON.parse(JSON.stringify(chameleonConfig[platform]));
+        utils.merge(base, newConfig);
+        chameleonConfig[platform] = base;
+      }
+    })
   }
   return chameleonConfig;
 }

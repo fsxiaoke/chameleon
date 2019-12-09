@@ -1,13 +1,14 @@
 
-
 exports.name = 'weex';
 exports.usage = '[command] [options]';
 exports.desc = 'tools for the weex project';
 
+/* istanbul ignore next */
 exports.register = function (commander) {
   commander
     .option('-r, --root [root]', 'specify project root')
     .option('-f, --file [router name]', 'specify file')
+    .option('-n, --nopreview ', "don't auto open preview")
     .action(function (...args) {
       cml.utils.checkProjectConfig();
       /* eslint-disable */

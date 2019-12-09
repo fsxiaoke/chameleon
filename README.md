@@ -22,23 +22,19 @@
 
 本仓库仅包含编译时代码，全部开源代码参见：https://github.com/chameleon-team
 
-本仓库分支说明
-
-- master 分支为稳定功能分支
-- v0.0.x 分支为 0.0.x 版本代码
-- v0.1.x 分支为 0.1.x 版本代码
-
-为了稳定性可控，不会频繁提交 master 更新。
-除了紧急 bug 修复，每份代码提交都有很严格的发布流程规范，会先在分支经历一段时间灰度期，确认稳定可用后才会合并到 master，
+master为稳定版本，除了紧急 bug 修复，每份代码提交都有很严格的发布流程规范，会先在分支经历一段时间灰度期，确认稳定可用后才会合并到 master，
 [进行中的项目分支介绍](https://github.com/didi/chameleon/wiki/%E8%BF%9B%E8%A1%8C%E4%B8%AD%E7%9A%84%E9%A1%B9%E7%9B%AE)
 
 ## CML 即 多端
+支持平台：**web、微信小程序、支付宝小程序、百度小程序、[android(weex)](https://github.com/chameleon-team/chameleon-sdk-android)、[ios(weex)](https://github.com/chameleon-team/chameleon-sdk-ios)、qq 小程序、[头条小程序（alpha版本）](https://cml.js.org/doc/example/tt_miniapp.html)、[快应用(进行中)](https://github.com/didi/chameleon/issues/185)、持续更新中**
 
 **一端所见即多端所见**——多端高度一致，无需关注各端文档。
 
 > 基于多态协议不影响各端差异化灵活性
+<a href="https://github.com/beatles-chameleon/cml-demo">
+<img src="https://cml.js.org/doc/assets/efficient.gif" width="400px"/>
+</a>
 
-![效果展示](https://cml.js.org/doc/assets/efficient.gif)
 
 |                                                                 web                                                                  |                                                             微信小程序                                                             |                                                              native-weex                                                              |                                                               百度小程序                                                               |                                                              支付宝小程序                                                              |
 | :----------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------: |
@@ -55,16 +51,39 @@
 
 而 Chameleon 属于后者，通过定义统一的语言框架+<a href="https://CML.JS.org/doc/framework/polymorphism/intro.html">统一多态协议</a>，从多端（对应多个独立服务）业务中抽离出自成体系、连续性强、可维护强的“前端中台服务”。
 
-![设计理念](https://cml.js.org/doc/assets/chameleon-idea.png)
+<img src="https://cml.js.org/doc/assets/chameleon-idea.png" width="400px"/>
 
 ### 跨端目标
 
 虽然不同各端环境千变万化，但万变不离其宗的是 MVVM 架构思想，**Chameleon 目标是让 MVVM 跨端环境大统一**。
 
-![Alt text](https://CML.JS.org/doc/assets/mvvm4.png)
+<img src="https://CML.JS.org/doc/assets/mvvm4.png" width="400px"/>
 
 ## 开发语言
+代码示例
+```html
+<template>
+  <view>
+    <text>{{title}}</text><text>{{reversedTitle}}</text>
+  </view>
+</template>
 
+<script>
+class Index  {
+  data = {
+    title: "chameleon"
+  }
+  computed = {
+    reversedTitle: function () {
+      return this.title.split('').reverse().join('')
+    }
+  }
+  mounted() {}
+  destroyed() {}
+}
+export default new Index();
+</script>
+```
 从事过网页编程的人知道，网页编程采用的是 HTML + CSS + JS 这样的组合，同样道理，chameleon 中采用的是 CML + CMSS + JS。
 
 [JS](https://CML.JS.org/doc/logic/logic.html)语法用于处理页面的逻辑层，与普通网页编程相比，本项目目标定义标准 MVVM 框架，拥有完整的生命周期，watch，computed，数据双向绑定等优秀的特性，能够快速提高开发速度、降低维护成本。
@@ -73,7 +92,9 @@
 
 [CMSS](https://CML.JS.org/doc/view/cmss.html)(Chameleon Style Sheets)用于描述 CML 页面结构的样式语言，其具有大部分 CSS 的特性，并且还可以支持各种 css 的预处语言`less stylus`。
 
-<b>通过以上对于开发语言的介绍，相信你看到只要是有过网页编程知识的人都可以快速的上手 chameleon 的开发</b>。
+CML 采用与 Vue 一致的组件化方案、单文件组织方式、生命周期，同时数据响应能力对齐 Vue，数据管理能力对齐 Vuex，非常方便开发者上手、维护。
+
+通过以上对于开发语言的介绍，相信你看到只要是有过网页编程知识的人都可以快速的上手chameleon的开发。
 
 ## 多端高度一致
 
@@ -115,8 +136,13 @@ Chameleon 不仅仅是跨端解决方案。基于优秀的前端打包工具 Web
 
 内部成员：透心凉、Sgoddon、动机不纯、Jalon、Jack、卡尺哈哈、change、Observer、Kevin、guoqingSmile、Mr.MY、JiM、lzc、名字待定、朱智恒、亭、龚磊、w55、小龙、不懂小彬、荣景超
 
-贡献参与者：
-快应用官方研发团队、broven（阿里）、Jeany（芒果 TV）、luyixin、z-mirror、夏夜焰火（百度）
+## 特别鸣谢
+[![zheyizhifeng](https://avatars3.githubusercontent.com/u/9592849?s=100&v=4)](https://github.com/zheyizhifeng)|[(头像空)](https://github.com/whuhenrylee)|[![broven](https://avatars0.githubusercontent.com/u/12854613?s=100&v=4)](https://github.com/broven/)|[(头像空)](https://github.com/Jeany/)
+:---:|:---:|:---:|:---:
+[zheyizhifeng（快应用）](https://github.com/zheyizhifeng)|[whuhenrylee（快应用）](https://github.com/whuhenrylee)|[broven（阿里影业）](https://github.com/broven/)|[Jeany（芒果 TV)](https://github.com/Jeany/)
+
+## 贡献者们
+快应用官方研发团队、luyixin、z-mirror、夏夜焰火（百度）
 
 ## 微信 & QQ 交流群
 

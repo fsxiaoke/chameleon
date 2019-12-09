@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 let webpostcssLoader = 'postcss-loader';
 const portfinder = require('portfinder');
 const analyzeTemplate = require('chameleon-template-parse').analyzeTemplate;
-const glob = require('glob');
+const cmlUtils = require('chameleon-tool-utils');
 
 exports.getPostcssrcPath = function (type) {
   return path.join(__dirname, `./postcss/${type}/.postcssrc.js`);
@@ -64,6 +64,29 @@ exports.cssLoaders = function (options) {
 
   // generate loader string to be used with extract text plugin
   function generateLoaders(loader, loaderOptions) {
+
+    // 扩展流程
+    if (cml.config.get().extPlatform && ~Object.keys(cml.config.get().extPlatform).indexOf(options.type)) {
+      let extLoaders = [
+        {
+          loader: 'mvvm-style-loader'
+        },
+        getPostCssLoader('extend')
+      ]
+      if (loader) {
+        extLoaders.push(
+          {
+            loader: loader + '-loader',
+            options: Object.assign({}, loaderOptions, {
+              sourceMap: false
+            })
+          }
+        )
+      }
+      addMediaLoader(extLoaders, options.type);
+      return extLoaders;
+    }
+
     var loaders = [cssLoader];
     let result = [];
 
@@ -79,7 +102,7 @@ exports.cssLoaders = function (options) {
       })
       loaders.push(getPostCssLoader('web'))
     }
-    if (~['wx', 'alipay', 'baidu'].indexOf(options.type)) {
+    if (~['wx', 'alipay', 'baidu', 'qq'].indexOf(options.type)) {
       loaders = loaders.concat(getMiniappLoader(options.type))
     }
 
@@ -193,7 +216,6 @@ exports.updateEntry = function (updateEntryConfig) {
           source = parts.template[0].content;
           options = analyzeTemplate(source, options)
         }
-
       }
     });
     let usedBuildInTagMap = options.usedBuildInTagMap;
@@ -219,6 +241,12 @@ exports.getMiniAppEntry = function (cmlType) {
   let root = cml.projectRoot;
   let entry = {};
   entry.common = [`chameleon-runtime/index.js`, `chameleon-store/index.js`];
+  //将 page.css  index.css 作为入口文件，注意这里会在 compalation.assets 中产生一个 js 文件 一个css文件
+  let pageCssPath = path.join(cml.projectRoot, 'node_modules', `chameleon-runtime/src/platform/${cmlType}/style/page.css`)
+  // 兼容老的chameleon-runtime 版本没有 page.css 这个文件；
+  let hasPageCss = cmlUtils.isFile(pageCssPath);
+  entry['static/css/index'] = `chameleon-runtime/src/platform/${cmlType}/style/index.css`;
+  hasPageCss && (entry['static/css/page'] = `chameleon-runtime/src/platform/${cmlType}/style/page.css`);
   let projectPath = path.resolve(root, 'src');
 
   // 记录已经添加的入口，防止重复循环添加
@@ -254,7 +282,8 @@ exports.getMiniAppEntry = function (cmlType) {
     // subProject的入口
     let subProject = cml.config.get().subProject;
     if (subProject && subProject.length > 0) {
-      subProject.forEach(function(npmName) {
+      subProject.forEach(function(item) {
+        let npmName = cmlUtils.isString(item) ? item : item.npmName;
         let npmRouterConfig = JSON.parse(fs.readFileSync(path.join(cml.projectRoot, 'node_modules', npmName, 'src/router.config.json'), {encoding: 'utf-8'}));
         npmRouterConfig.routes && npmRouterConfig.routes.forEach(item => {
           let routePath = item.path;
@@ -512,7 +541,6 @@ let babelNpm = [
   'chameleon-api',
   'chameleon-tool-utils',
   'chameleon-css-loader',
-  'chameleon-loader',
   'chameleon-miniapp-target',
   'chameleon-mixins',
   'chameleon-template-parse',
@@ -527,6 +555,9 @@ let babelNpm = [
   'webpack-liveload-middleware',
   'chameleon-weex-vue-loader',
   'babel-plugin-chameleon-import',
+  'mvvm-interface-parser',
+  'chameleon-loader',
+  'mobx',
   'fcml-ui'
 ];
 
@@ -537,8 +568,12 @@ exports.getBabelPath = function () {
     path.join(cml.root, 'configs')
   ]
   babelNpm.forEach(item => {
-    babelPath.push(path.join(cml.projectRoot, 'node_modules', item))
-    babelPath.push(path.join(cml.root, 'node_modules', item))
+    if (typeof item === 'string') {
+      babelPath.push(path.join(cml.projectRoot, 'node_modules', item))
+      babelPath.push(path.join(cml.root, 'node_modules', item))
+    } else if (item instanceof RegExp) {
+      babelPath.push(item)
+    }
   })
   let configBabelPath = cml.config.get().babelPath || [];
   return configBabelPath.concat(babelPath);

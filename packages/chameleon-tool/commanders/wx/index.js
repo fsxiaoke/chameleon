@@ -1,12 +1,12 @@
-
 exports.name = 'wx';
 exports.usage = '[command] [options]';
 exports.desc = 'tools for the weixin miniprogram project';
 
-
+/* istanbul ignore next */
 exports.register = function (commander) {
   commander
     .option('-r, --root [root]', 'specify project root')
+    .option('-n, --nopreview ', "don't auto open preview")
     .action(function (...args) {
       cml.utils.checkProjectConfig();
       /* eslint-disable */

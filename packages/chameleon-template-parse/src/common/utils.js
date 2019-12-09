@@ -233,7 +233,7 @@ _.weexVUEClassNodes = function (options) {
         let newClassNodeValue = utils.trimCurly(itemNode.value.value);
         itemNode.value.value = `${weexMixins.weexClassProxy}((${newClassNodeValue}))`
       } else {// 静态的
-        itemNode.value.value = `${itemNode.value.value}  ${extraClass}`
+        itemNode.value.value = ` ${extraClass} ${itemNode.value.value}`
       }
     })
   } else if (classNodes.length === 2) {
@@ -244,7 +244,7 @@ _.weexVUEClassNodes = function (options) {
         let newClassNodeValue = utils.trimCurly(itemNode.value.value);
         itemNode.value.value = `${weexMixins.weexClassProxy}((${newClassNodeValue}))`
       } else { // 静态的
-        itemNode.value.value = `${itemNode.value.value}  ${extraClass}`
+        itemNode.value.value = ` ${extraClass} ${itemNode.value.value}`
       }
     })
   }
@@ -289,7 +289,8 @@ _.miniappVUEClassNodes = function (options) {
 _.getInlineStatementArgs = function(argsStr) {
   // argsStr:"1,'index'+1,$event,'item',index+1,item"
   const result = argsStr.split(',').reduce((result, current, index) => {
-    if (current === '$event') {
+    // if (current === '$event') {
+    if (/\s*?\$event\s*?/.test(current)) {
       result.push("'$event'");
     } else {
       result.push(current)

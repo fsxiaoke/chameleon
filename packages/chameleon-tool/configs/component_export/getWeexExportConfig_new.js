@@ -12,7 +12,8 @@ module.exports = function(options) {
   let {
     media,
     root,
-    mode = 'production'
+    mode = 'production',
+    externals
   } = options;
 
 
@@ -155,6 +156,9 @@ module.exports = function(options) {
     ]
   }
 
+  if (externals) {
+    exportConfig.externals = externals;
+  }
 
   return merge.smart(getWeexCommonConfig(options), exportConfig)
 }
