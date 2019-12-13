@@ -30,7 +30,7 @@ if (promise instanceof Promise) {
 function initV() {
   if(weex && weex.config.env.appVersionCode < limitedVersion){
     let page = weex.requireModule('PageApiModule');
-    page.startPage('fs://app/upgrade',{});
+    page.startPage('fs://app/upgrade',{title_name:'Upgrade'});
     page.finish();
     return;
   }

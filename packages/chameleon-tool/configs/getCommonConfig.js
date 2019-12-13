@@ -215,7 +215,7 @@ module.exports = function (options) {
     'process.env.publicPath': JSON.stringify(publicPath)
   }))
   commonConfig.plugins.push(new webpack.DefinePlugin({
-    'process.env.singlePage': JSON.stringify(options.singlePage === false ? 'false' : 'true')
+    'process.env.singlePage': JSON.stringify(!!options.singlePage === false ? 'false' : 'true')
   }))
   commonConfig.plugins.push(new webpack.DefinePlugin({
     'process.env.devServer': JSON.stringify(devApiPrefix)
