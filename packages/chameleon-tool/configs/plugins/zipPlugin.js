@@ -47,7 +47,7 @@ class ZipPlugin {
           }
         })
 
-        outputPathAndFilename = path.resolve(compilation.options.output.path, `${outputPathAndFilename}`)
+        outputPathAndFilename = path.resolve(compilation.options.output.path, `../zip/${outputPathAndFilename}`)
         let relativeOutputPath = path.relative(
           compilation.options.output.path,
           outputPathAndFilename

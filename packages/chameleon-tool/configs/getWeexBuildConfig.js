@@ -57,7 +57,7 @@ module.exports = function (options) {
       return;
     }
     let bundleName = (routerConfig.routes.find(e => e.name === key) || {}).bundleName || '';
-    bundleName = bundleName.replace(/\//g, '+');
+    bundleName = bundleName + '_[hash]'
     var buildConfig = {
       output: {
         path: `${outputPath}/${key}`,
