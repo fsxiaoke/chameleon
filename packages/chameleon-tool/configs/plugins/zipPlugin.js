@@ -42,12 +42,17 @@ class ZipPlugin {
         let outputPathAndFilename = self.options.filename.replace(/\[[\w:]+\]/g, (index) => {
           index = index.replace('[', '').replace(']', '');
           switch (index) {
-            case 'hash': return hash.digest('hex')
+            case 'hash':let hashStr = hash.digest('hex');
+            let outputStr = `"${self.options.bundleName}":"${hashStr}",`;
+            fs.appendFile(path.resolve(compilation.options.output.path,'../assets.json'),outputStr,(err)=>{
+              console.log(err||'');
+            } )
+            return hashStr;
             default: return ''
           }
         })
 
-        outputPathAndFilename = path.resolve(compilation.options.output.path, `../zip/${outputPathAndFilename}`)
+        outputPathAndFilename = path.resolve(compilation.options.output.path, `${outputPathAndFilename}`)
         let relativeOutputPath = path.relative(
           compilation.options.output.path,
           outputPathAndFilename
