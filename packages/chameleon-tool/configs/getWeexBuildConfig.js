@@ -4,7 +4,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const AssetsPlugin = require('assets-webpack-plugin')
 var getWeexCommonConfig = require('./getWeexCommonConfig.js');
 var getWeexExportConfig = require('./component_export/getWeexExportConfig_new');
-const ZipPlugin = require('zip-webpack-plugin');
+const ZipPlugin = require('./plugins/zipPlugin');
 
 
 var merge = require('webpack-merge')
@@ -58,7 +58,7 @@ module.exports = function (options) {
     }
     let bundleName = (routerConfig.routes.find(e => e.name === key) || {}).bundleName || '';
    // bundleName = bundleName.replace(/\//g, '+');
-    bundleName = bundleName+'_[hash]';
+    let tmpFileName= bundleName+'_[hash]';
     var buildConfig = {
       output: {
         path: `${outputPath}/${key}`,
@@ -67,7 +67,8 @@ module.exports = function (options) {
       plugins: [
         new CleanWebpackPlugin(['./*'], {root: outputPath, verbose: false}),
         new ZipPlugin({
-          filename: `${bundleName || key}.zip`
+          bundleName:bundleName,
+          filename: `../zip/${tmpFileName || key}.zip`
         })
       ]
     }
