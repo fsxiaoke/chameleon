@@ -32,7 +32,7 @@ function initV() {
   appVersionCode = appVersionCode + '';
   if(appVersionCode.indexOf('100') === 0) appVersionCode = appVersionCode.substring(3);
   if(appVersionCode < limitedVersion){
-    let page = weex.requireModuxe('PageApiModule');
+    let page = weex.requireModule('PageApiModule');
     page.startPage('fs://app/upgrade',{title_name:'Upgrade'});
     page.finish();
     return;
