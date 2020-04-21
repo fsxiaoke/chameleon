@@ -44,9 +44,10 @@ class ZipPlugin {
           switch (index) {
             case 'hash':let hashStr = hash.digest('hex');
             let outputStr = `"${self.options.bundleName}":"${hashStr}",`;
-            fs.appendFile(path.resolve(compilation.options.output.path,'../assets.json'),outputStr,(err)=>{
-              console.log(err||'');
-            } )
+            compilation.assets[path.relative(
+                compilation.options.output.path,
+                path.resolve(compilation.options.output.path, `../${hashStr}.json`)
+              )] = new RawSource(outputStr);
             return hashStr;
             default: return ''
           }
