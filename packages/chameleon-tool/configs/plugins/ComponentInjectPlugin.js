@@ -24,7 +24,11 @@ class ComponentInjectPlugin {
 
     function injectComponents2Cml(compilation, callback) {
       if (!injectConfig) {
-        injectConfig = JSON.parse(fs.readFileSync(path.join(cml.projectRoot, "inject-usingcomponent-config.json"), {encoding: 'utf-8'}))
+        let configJsonPath = path.join(cml.projectRoot, "inject-usingcomponent-config.json");
+        if (!fs.existsSync(configJsonPath)) {
+          return callback && callback()
+        }
+        injectConfig = JSON.parse(fs.readFileSync(configJsonPath, {encoding: 'utf-8'}))
         if (!injectConfig || !injectConfig.length) {
           return callback && callback()
         }
