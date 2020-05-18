@@ -1,3 +1,4 @@
+const ComponentInjectPlugin = require('./plugins/ComponentInjectPlugin.js');
 const utils = require('./utils.js');
 const cmlLoaderConfig = require('./cml-loader.conf')({type: 'weex'})
 const path = require('path');
@@ -74,7 +75,8 @@ module.exports = function (options) {
         banner: '// { "framework": "Vue"} \n',
         raw: true,
         exclude: 'Vue'
-      })
+      }),
+      new ComponentInjectPlugin(options)
 
     ],
     node: config.nodeConfiguration
