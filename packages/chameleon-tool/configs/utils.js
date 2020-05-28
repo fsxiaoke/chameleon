@@ -485,11 +485,15 @@ exports.getWeexEntry = function (options) {
           fs.mkdirSync(path.join(cml.projectRoot, `node_modules/chameleon-runtime/.temp`))
         }
         fs.writeFileSync(path.join(cml.projectRoot, `node_modules/chameleon-runtime/.temp/${name}.js`), entryStr);
-        entry[name] = path.join(cml.projectRoot, `node_modules/chameleon-runtime/.temp/${name}.js`)
+        var entryFile = [path.join(cml.projectRoot, `node_modules/chameleon-runtime/.temp/${name}.js`)];
+        if (options.babelPolyfill === true) {
+          entryFile.unshift(path.join(__dirname, 'default/miniappPolyfill.js'));
+        }
+        entry[name] = entryFile;
       })
     }
   }
- 
+
   return entry;
 }
 
