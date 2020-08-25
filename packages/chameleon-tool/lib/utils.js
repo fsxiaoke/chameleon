@@ -4,6 +4,8 @@ const fse = require('fs-extra');
 const watch = require('node-watch');
 
 const utils = require('chameleon-tool-utils');
+
+const childProcess = require('child_process');
 // 创建路由文件
 // platform   web端和weex端 现在没有用到，如果要区分，cml weex dev命令要执行两遍， web和weex的要生成两个不同的routerOptions文件
 // media dev模式开启watch  其他情况不监听变化 否则命名行不结束
@@ -50,6 +52,18 @@ utils.setTempRoot = function (tmp) {
     console.log(e);
   }
 };
+
+// 检查fs-base-chameleon版本，不一致时报错
+utils.checkBaseChameleon = function () {
+  let sout = childProcess.execSync("npm list fs-base-chameleon") + ""
+  let arr = sout.match(/fs-base-chameleon@([0-9]|\.)*/g);
+  let allVersionLibs = arr.filter((e, i) => arr.indexOf(e) == i)
+  if (allVersionLibs.length > 1) {
+    cml.log.error("依赖了不同版本的fs-base-chameleon（不允许）")
+    cml.log.notice(sout)
+    process.exit();
+  }
+}
 
 // 生成config.json文件
 module.exports = utils;
