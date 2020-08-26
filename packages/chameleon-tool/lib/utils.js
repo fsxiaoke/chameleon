@@ -55,13 +55,17 @@ utils.setTempRoot = function (tmp) {
 
 // 检查fs-base-chameleon版本，不一致时报错
 utils.checkBaseChameleon = function () {
-  let sout = childProcess.execSync("npm list fs-base-chameleon") + ""
-  let arr = sout.match(/fs-base-chameleon@([0-9]|\.)*/g);
-  let allVersionLibs = arr.filter((e, i) => arr.indexOf(e) == i)
-  if (allVersionLibs.length > 1) {
-    cml.log.error("依赖了不同版本的fs-base-chameleon（不允许）")
-    cml.log.notice(sout)
-    process.exit();
+  try {
+    let sout = childProcess.execSync("npm list fs-base-chameleon") + ""
+    let arr = sout.match(/fs-base-chameleon@([0-9]|\.)*/g);
+    let allVersionLibs = arr.filter((e, i) => arr.indexOf(e) == i)
+    if (allVersionLibs.length > 1) {
+      cml.log.warn("依赖了不同版本的fs-base-chameleon\n****fs-base-chameleon必须全局一个版本，里面的 config, event 实现依赖全局唯一****")
+      cml.log.warn(sout)
+      // process.exit();
+    }
+  } catch (e) {
+    cml.log.warn(e)
   }
 }
 
